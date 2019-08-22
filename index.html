@@ -15,7 +15,10 @@
       }
       select{
         height: 2rem;
-        border: solid 1px black;
+        /* border: solid 1px black; */
+      }
+      .rating{
+
       }
     </style>
   </head>
@@ -49,11 +52,11 @@
 
 
 
-      const CompanyFollowing = ({company}) => {
+      const CompanyFollowing = ({company, followed, onChange }) => {
         return (
           <li>
             {company.name}
-            <select >
+            <select value={followed ? followed.rating : ''} onChange={(ev)=> onChange(company, followed, ev.target.value)} >
               {
                 ['', 1, 2, 3, 4, 5].map( num => <option key={num}>{num}</option>)
               }
@@ -68,16 +71,38 @@
           this.state={
             user: {},
             companies: [],
+            following: []
           }
+          this.onChange = this.onChange.bind(this)
         }
         async componentDidMount(){
           const user = await fetchUser();
           const companies = (await axios.get(`${API}/companies`)).data;
-          // const following = (await axios.get(`users/${user.id}/followingCompanies`)).data;
-          this.setState({user, companies});
+          const following = (await axios.get(`${API}/users/${user.id}/followingCompanies`)).data;
+          console.log(following)
+          this.setState({user, companies, following});
         }
+        onChange(companies, followed, rating){
+          if(followed){
+            if(rating){
+              axios.post(`${API}/users/${user.id}/followingCompanies`).data
+            }
+            else {
+              const deleted = axios.delete(`${API}/users/${user.id}/followingCompanies`).data
+              this.setState({ deleted });
+            }
+          }
+          else{
+            const create = axios.put(`${API}/users/${user.id}/followingCompanies`).data
+            this.setState({create});
+          }
+        }
+
+
+
         render(){
-          const { companies, user} = this.state;
+          const { companies, user, following} = this.state;
+          const {onChange} = this;
           return (
             <div>
               <h1>Companies</h1>
@@ -85,7 +110,8 @@
                 {
                   companies.map( company =>  <CompanyFollowing key={company.id}
                   company={company}
-                  // followed={following.find(f => f.companyId === company.id)}
+                  onChange= {onChange}
+                  followed={following.find(f => f.companyId === company.id)}
                   />)
                 }
               </ul>
