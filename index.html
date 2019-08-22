@@ -23,6 +23,7 @@
     </style>
   </head>
   <body>
+    <h1>Acme Company Followers</h1>
     <div id="root"></div>
     <script type="text/babel">
       const { render } = ReactDOM;
@@ -52,7 +53,7 @@
 
 
 
-      const CompanyFollowing = ({company, followed, onChange }) => {
+      const CompanyFollowing = ({user, company, followed, onChange }) => {
         return (
           <li>
             {company.name}
@@ -82,19 +83,18 @@
           console.log(following)
           this.setState({user, companies, following});
         }
-        onChange(companies, followed, rating){
+        onChange(user, companies, followed, rating){
           if(followed){
             if(rating){
               axios.post(`${API}/users/${user.id}/followingCompanies`).data
             }
             else {
-              const deleted = axios.delete(`${API}/users/${user.id}/followingCompanies`).data
-              this.setState({ deleted });
+              axios.delete(`${API}/users/${user.id}/followingCompanies`).data
             }
           }
           else{
-            const create = axios.put(`${API}/users/${user.id}/followingCompanies`).data
-            this.setState({create});
+            axios.put(`${API}/users/${user.id}/followingCompanies`).data
+
           }
         }
 
@@ -105,12 +105,13 @@
           const {onChange} = this;
           return (
             <div>
-              <h1>Companies</h1>
+              <h3>You ({user.fullName}) are following ?? Companies</h3>
               <ul>
                 {
                   companies.map( company =>  <CompanyFollowing key={company.id}
                   company={company}
                   onChange= {onChange}
+                  user={user}
                   followed={following.find(f => f.companyId === company.id)}
                   />)
                 }
