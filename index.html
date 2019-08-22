@@ -6,7 +6,17 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js"></script>
     <style>
-
+      body{
+        font-family: sans-serif;
+      }
+      li{
+        display: flex;
+        flex-direction: column;
+      }
+      select{
+        height: 2rem;
+        border: solid 1px black;
+      }
     </style>
   </head>
   <body>
@@ -38,25 +48,48 @@
     };
 
 
+
+      const CompanyFollowing = ({company}) => {
+        return (
+          <li>
+            {company.name}
+            <select >
+              {
+                ['', 1, 2, 3, 4, 5].map( num => <option key={num}>{num}</option>)
+              }
+            </select>
+          </li>
+        )
+      }
+
       class App extends Component{
         constructor(){
           super();
           this.state={
             user: {},
             companies: [],
-            following: []
           }
         }
         async componentDidMount(){
           const user = await fetchUser();
           const companies = (await axios.get(`${API}/companies`)).data;
-          // const following = (await axios.get())
+          // const following = (await axios.get(`users/${user.id}/followingCompanies`)).data;
           this.setState({user, companies});
         }
         render(){
           const { companies, user} = this.state;
           return (
-            <hr />
+            <div>
+              <h1>Companies</h1>
+              <ul>
+                {
+                  companies.map( company =>  <CompanyFollowing key={company.id}
+                  company={company}
+                  // followed={following.find(f => f.companyId === company.id)}
+                  />)
+                }
+              </ul>
+            </div>
           )
         }
       }
